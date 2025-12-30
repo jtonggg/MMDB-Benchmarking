@@ -27,7 +27,7 @@ Visual Studio Code (optional) – recommended for running/debugging scripts.
 docker run -d --name arangodb -p 8529:8529 arangodb:3.12.7
 docker run -d --name mongodb -p 27017:27017 mongo:8.2.3
 docker run -d --name neo4j -p 7687:7687 neo4j:2025.11.2
-3. Verify containers are running:
+4. Verify containers are running:
 docker ps
 
 
