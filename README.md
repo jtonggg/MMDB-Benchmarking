@@ -26,6 +26,7 @@ Visual Studio Code (optional) – recommended for running/debugging scripts.
 # Setup Instructions
 1. Clone this repository:
 2. Start the database containers using Docker:
+   
 docker run -d --name arangodb -p 8529:8529 arangodb:3.12.7
 
 docker run -d --name mongodb -p 27017:27017 mongo:8.2.3
