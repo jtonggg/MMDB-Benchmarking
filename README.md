@@ -1,12 +1,12 @@
 # MMDB-Benchmarking
-Python scripts for Multi-Model Database benchmarking study comparing ArangoDB and a Polyglot stack (MongoDB + Neo4j).
+This repository provides the experimental framework and Python benchmarking scripts used to compare the architectural efficiency of a Native Multi-Model Database (ArangoDB) against a Polyglot Persistence stack (MongoDB + Neo4j).
 
 # Project Overview
-This repository contains scripts, datasets, and instructions to reproduce the performance benchmarks for evaluating:
+The study evaluates these architectures under controlled workloads to identify trade-offs in performance, resource consumption, and scalability. The benchmarks focus on:
 - Ingestion latency
 - Query response time
 - Resource utilization (CPU & memory)
-- Scalability across dataset sizes
+- Scalability across dataset sizes （100, 1000 and 5000 records）
 
 Databases tested:
 ArangoDB (native multi-model)
@@ -36,5 +36,10 @@ docker run -d --name neo4j -p 7687:7687 neo4j:2025.11.2
 3. Verify containers are running:
 docker ps
 
+# Running the Benchmarks
+Important: Each script contains a Configuration Section at the top. Ensure the container names in the script match your docker ps output before running.
 
 
+# Methodology Highlights
+Data Generation: Synthetic enterprise product catalogs generated via the Faker library .
+Resource Tracking: Performance metrics are captured directly from the Docker Engine kernel via a custom monitoring wrapper.
