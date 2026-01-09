@@ -47,5 +47,6 @@ Important: Each script contains a Configuration Section at the top. Ensure the c
 
 
 # Methodology Highlights
-Data Generation: Synthetic enterprise product catalogs generated via the Faker library .
+Data Generation: Synthetic enterprise product catalogs generated via the Faker library.
+
 Resource Tracking: Performance metrics are captured directly from the Docker Engine kernel via a custom monitoring wrapper.
