@@ -7,20 +7,30 @@ from pymongo import MongoClient
 from neo4j import GraphDatabase
 from arango import ArangoClient
 
-# --- CONFIGURATION ---
-DATA_SIZES = [100, 1000, 5000]  # Scalability testing
-NUM_RUNS = 3                     # Consistency testing
+# --- CONFIGURATION SECTION ---
+# ############################################################################
+# NOTE: Change the names below to match your own Docker container names.
+# You can find your container names by running 'docker ps' in your terminal.
+# ############################################################################
+ARANGO_CONTAINER = "objective_dewdney"  # <-- Change this to your ArangoDB container name
+MONGO_CONTAINER  = "mongodb"            # <-- Change this to your MongoDB container name
+NEO4J_CONTAINER  = "neo4j"              # <-- Change this to your Neo4j container name
+
+DATA_SIZES = [100, 1000, 5000] 
+NUM_RUNS = 3                    
 fake = Faker()
 NEO4J_PASS = "testpass"         
 
 # --- CPU/MEM Functions ---
 def parse_percent(value):
+    """Convert '12.34%' to float 12.34, or return None if invalid."""
     try:
         return float(value.strip('%'))
     except:
         return None
 
 def get_container_stats(container_name):
+    """Fetches real-time resource utilization via Docker CLI."""
     try:
         result = subprocess.run(
             ["docker", "stats", container_name, "--no-stream", "--format", "{{json .}}"],
@@ -36,6 +46,7 @@ def get_container_stats(container_name):
 
 # --- Data Generation ---
 def generate_data(count):
+    """Generates synthetic product records for tiered testing."""
     return [
         {
             "id": fake.uuid4(),
@@ -61,7 +72,7 @@ def run_scalability_test():
     neo4j_driver = GraphDatabase.driver("bolt://localhost:7687", auth=("neo4j", NEO4J_PASS))
 
     for size in DATA_SIZES:
-        print(f"\n🚀 Testing Scalability: {size} Records")
+        print(f"\nTesting Scalability: {size} Records")
         arango_runs, arango_cpu, arango_mem = [], [], []
         poly_runs, mongo_cpu, mongo_mem, neo4j_cpu, neo4j_mem = [], [], [], [], []
 
@@ -76,7 +87,9 @@ def run_scalability_test():
                 col.insert_many(arango_data)
                 elapsed = time.time() - start
                 arango_runs.append(elapsed)
-                cpu, mem = get_container_stats("objective_dewdney")
+                
+                # Use configured container name
+                cpu, mem = get_container_stats(ARANGO_CONTAINER)
                 arango_cpu.append(cpu)
                 arango_mem.append(mem)
                 print(f"ArangoDB Run {run+1}: Latency={elapsed:.4f}s | CPU={cpu} | MEM={mem}")
@@ -85,6 +98,7 @@ def run_scalability_test():
                 mongo_db.delete_many({})
                 with neo4j_driver.session() as session:
                     session.run("MATCH (n) DETACH DELETE n")
+                
                 neo4j_data = [{k: v for k, v in doc.items() if k != "_id"} for doc in data]
                 start = time.time()
                 mongo_db.insert_many(data)
@@ -92,8 +106,10 @@ def run_scalability_test():
                     session.run("UNWIND $props AS map CREATE (p:Product) SET p = map", props=neo4j_data)
                 elapsed = time.time() - start
                 poly_runs.append(elapsed)
-                m_cpu, m_mem = get_container_stats("mongodb")
-                n_cpu, n_mem = get_container_stats("neo4j")
+                
+                # Use configured container names for Polyglot
+                m_cpu, m_mem = get_container_stats(MONGO_CONTAINER)
+                n_cpu, n_mem = get_container_stats(NEO4J_CONTAINER)
                 mongo_cpu.append(m_cpu)
                 mongo_mem.append(m_mem)
                 neo4j_cpu.append(n_cpu)
@@ -103,7 +119,7 @@ def run_scalability_test():
             except Exception as e:
                 print(f"Run {run+1} failed: {e}")
 
-        # Record average times and stats
+        # Record average times and stats for the current tier
         results["Arango"][size] = {
             "latency": statistics.mean(arango_runs),
             "cpu": statistics.mean([v for v in arango_cpu if v is not None]),
@@ -117,7 +133,7 @@ def run_scalability_test():
             "neo4j_mem": statistics.mean([v for v in neo4j_mem if v is not None])
         }
 
-    # --- Final Results Table ---
+    # --- Results Table Summary ---
     print("\n" + "="*70)
     print(f"{'Data Size':<12} | {'Arango Lat (s)':<14} | {'Arango CPU (%)':<14} | {'Arango MEM (%)':<14} | "
           f"{'Poly Lat (s)':<12} | {'Mongo CPU (%)':<12} | {'Mongo MEM (%)':<12} | {'Neo4j CPU (%)':<12} | {'Neo4j MEM (%)':<12}")
