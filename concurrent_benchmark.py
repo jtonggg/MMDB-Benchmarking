@@ -7,6 +7,15 @@ from neo4j import GraphDatabase
 from arango import ArangoClient
 from faker import Faker
 
+# --- CONFIGURATION SECTION ---
+# ############################################################################
+# NOTE: Change the names below to match your own Docker container names.
+# You can find your container names by running 'docker ps' in your terminal.
+# ############################################################################
+ARANGO_CONTAINER = "objective_dewdney"  # <-- Change this to your ArangoDB container name
+MONGO_CONTAINER  = "mongodb"            # <-- Change this to your MongoDB container name
+NEO4J_CONTAINER  = "neo4j"              # <-- Change this to your Neo4j container name
+
 NUM_THREADS = 5
 NUM_RECORDS_PER_THREAD = 200
 NEO4J_PASS = "testpass"
@@ -72,7 +81,8 @@ def run_concurrent_benchmark():
     for t in threads: t.start()
     for t in threads: t.join()
     arango_time = time.time() - start
-    arango_cpu, arango_mem = get_container_stats("objective_dewdney")  # Replace with your Arango container name
+    # Using the variable from configuration
+    arango_cpu, arango_mem = get_container_stats(ARANGO_CONTAINER)
 
     # --- Polyglot Insert ---
     threads = [Thread(target=polyglot_insert_task, args=(mongo_col, neo4j_driver, data)) for data in thread_data]
@@ -80,11 +90,12 @@ def run_concurrent_benchmark():
     for t in threads: t.start()
     for t in threads: t.join()
     poly_time = time.time() - start
-    mongo_cpu, mongo_mem = get_container_stats("mongodb")  # Replace with your Mongo container name
-    neo4j_cpu, neo4j_mem = get_container_stats("neo4j")    # Replace with your Neo4j container name
+    # Using the variables from configuration
+    mongo_cpu, mongo_mem = get_container_stats(MONGO_CONTAINER)
+    neo4j_cpu, neo4j_mem = get_container_stats(NEO4J_CONTAINER)
 
     # --- Results ---
-    print(f"\nConcurrent Inserts Benchmark:")
+    print(f"\nConcurrent Inserts Benchmark Results:")
     print(f"ArangoDB: Latency={arango_time:.4f}s | CPU={arango_cpu} | MEM={arango_mem}")
     print(f"Polyglot: Latency={poly_time:.4f}s")
     print(f" - MongoDB CPU={mongo_cpu} MEM={mongo_mem}")
