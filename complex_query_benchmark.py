@@ -5,6 +5,15 @@ from pymongo import MongoClient
 from neo4j import GraphDatabase
 from arango import ArangoClient
 
+# --- CONFIGURATION SECTION ---
+# ############################################################################
+# NOTE: Change the names below to match your own Docker container names.
+# You can find your container names by running 'docker ps' in your terminal.
+# ############################################################################
+ARANGO_CONTAINER = "objective_dewdney"  # <-- Change this to your ArangoDB container name
+MONGO_CONTAINER  = "mongodb"            # <-- Change this to your MongoDB container name
+NEO4J_CONTAINER  = "neo4j"              # <-- Change this to your Neo4j container name
+
 NUM_RUNS = 3
 NEO4J_PASS = "testpass"
 
@@ -56,7 +65,8 @@ def run_complex_query_benchmark():
             elapsed = time.time() - start
             arango_times.append(elapsed)
             
-            cpu, mem = get_container_stats("objective_dewdney")
+            # Use the variable defined in configuration
+            cpu, mem = get_container_stats(ARANGO_CONTAINER)
             arango_cpu_stats.append(cpu)
             arango_mem_stats.append(mem)
             
@@ -84,8 +94,10 @@ def run_complex_query_benchmark():
             elapsed = time.time() - start
             poly_times.append(elapsed)
             
-            mongo_cpu, mongo_mem = get_container_stats("mongodb")
-            neo4j_cpu, neo4j_mem = get_container_stats("neo4j")
+            # Use the variables defined in configuration
+            mongo_cpu, mongo_mem = get_container_stats(MONGO_CONTAINER)
+            neo4j_cpu, neo4j_mem = get_container_stats(NEO4J_CONTAINER)
+            
             mongo_cpu_stats.append(mongo_cpu)
             mongo_mem_stats.append(mongo_mem)
             neo4j_cpu_stats.append(neo4j_cpu)
