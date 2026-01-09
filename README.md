@@ -20,18 +20,21 @@ Before running the scripts, ensure you have the following installed:
 
 pip install faker pymongo neo4j python-arango
 
-Visual Studio Code (optional) – recommended for running/debugging scripts.
+- Visual Studio Code (optional) – recommended for running/debugging scripts.
 
 
 # Setup Instructions
 1. Clone this repository:
 2. Start the database containers using Docker:
    
-docker run -d --name arangodb -p 8529:8529 arangodb:3.12.7
+# ArangoDB (Multi-model)
+docker run -d --name arangodb -p 8529:8529 -e ARANGO_ROOT_PASSWORD=arangopass arangodb:3.12.7
 
+# MongoDB (Document Store)
 docker run -d --name mongodb -p 27017:27017 mongo:8.2.3
 
-docker run -d --name neo4j -p 7687:7687 neo4j:2025.11.2
+# Neo4j (Graph Database)
+docker run -d --name neo4j -p 7687:7687 -e NEO4J_AUTH=neo4j/testpass neo4j:2025.11.2
 
 3. Verify containers are running:
 docker ps
