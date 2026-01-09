@@ -28,12 +28,15 @@ pip install faker pymongo neo4j python-arango
 2. Start the database containers using Docker:
    
 ArangoDB (Multi-model)
+
 docker run -d --name arangodb -p 8529:8529 -e ARANGO_ROOT_PASSWORD=arangopass arangodb:3.12.7
 
 MongoDB (Document Store)
+
 docker run -d --name mongodb -p 27017:27017 mongo:8.2.3
 
 Neo4j (Graph Database)
+
 docker run -d --name neo4j -p 7687:7687 -e NEO4J_AUTH=neo4j/testpass neo4j:2025.11.2
 
 3. Verify containers are running:
