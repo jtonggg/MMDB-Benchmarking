@@ -25,17 +25,17 @@ pip install faker pymongo neo4j python-arango
 
 # Setup Instructions
 1. Clone this repository:
-2. Start the database containers using Docker:
+2. To initialize Database Containers，run the following commands to start the specific NoSQL engines used in this study :
    
-ArangoDB (Multi-model)
+ArangoDB
 
 docker run -d --name arangodb -p 8529:8529 -e ARANGO_ROOT_PASSWORD=arangopass arangodb:3.12.7
 
-MongoDB (Document Store)
+MongoDB
 
 docker run -d --name mongodb -p 27017:27017 mongo:8.2.3
 
-Neo4j (Graph Database)
+Neo4j
 
 docker run -d --name neo4j -p 7687:7687 -e NEO4J_AUTH=neo4j/testpass neo4j:2025.11.2
 
